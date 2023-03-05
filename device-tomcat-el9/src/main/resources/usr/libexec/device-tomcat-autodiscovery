@@ -1,0 +1,164 @@
+#!/bin/bash
+
+#
+# Tomcat Server Autodiscovery
+# ===========================
+#
+# This script autogenerates any required tomcat instances.
+
+set -e
+umask 0007
+
+
+#
+# Handle the cleanup
+# ------------------
+cleanup_before_exit () { 
+  if [ -d "${tmpdir}" ]; then
+    rm -rf "${tmpdir}"
+  fi
+}
+# be in a temporay workspace (this works on linux and macosx)
+tmpdir=`mktemp -d 2>/dev/null || mktemp -d -t 'tmpdir'`
+# trap catches the exit signal and runs the specified function
+trap cleanup_before_exit EXIT
+# be in our directory
+cd "${tmpdir}"
+
+
+#
+# Create instance that does not yet exist
+create_instance() {
+  instance="${1}"
+  application="${2}"
+
+}
+
+
+#
+# Remove instance that exists
+remove_instance() {
+  instance="${1}"
+  application="${2}"
+
+}
+
+
+
+#
+# Per application? Run all scripts
+
+run_scripts() {
+
+  instance="${1}"
+  application="${2}"
+  line="${3}"
+
+  logger -t "tomcat-autodiscovery@${instance}" "running autodiscovery for tomcat instance ${instance} / application ${application}..."
+
+  find "$0.d" -type f -executable | sort | \
+  while read x; do
+    "$x" "${instance}" "${application}" "${line}" < /dev/null || touch error;
+  done
+
+  if test ! -f "error"; then
+    logger -t "tomcat-autodiscovery@${instance}" "completed autodiscovery for tomcat instance ${instance} / application ${application}."
+    exit 0
+  else
+    logger -t "tomcat-autodiscovery@${instance}" "failed autodiscovery for tomcat instance ${instance} / application ${application}."
+    exit 1
+  fi
+
+}
+
+
+# Per instance? Add/remove instances
+
+if [ $# -eq 1 ]; then
+
+  instance="${1}"
+
+  find "/etc/device/services/www/app/${instance}/" -mindepth 1 -maxdepth 1 -type l | \
+  while read line; do
+
+    target=$(readlink -f "$line")
+
+    if test ! -f "$line/name.txt"; then
+      continue;
+    fi
+    application="$(head $line/name.txt)"
+
+    # add new instances
+    if test -f "$line/added"; then
+
+      # instance already exist and we're told to add? none of our business, remove the device config for safety
+      if test -d "/var/lib/tomcats/${instance}-${application}"; then
+
+        logger -t tomcat-autodiscovery@${instance} "/var/lib/tomcats/${instance}-${application} already exists, ignoring '$line'."
+        echo "${instance}-${application} already exists" > ${line}/error
+
+        continue;
+      fi
+
+      logger -t tomcat-autodiscovery@${instance} "creating tomcat instance ${instance}-${application}..."
+      create_instance "${instance}" "${application}"
+      run_scripts "${instance}" "${application}" "${line}"
+      logger -t tomcat-autodiscovery@${instance} "created tomcat instance ${instance}-${application}."
+
+      if test -f "$line/disabled.bin"; then
+
+        systemctl disable "tomcat@${instance}-${application}"
+        systemctl stop "tomcat@${instance}-${application}"
+
+      else
+
+        systemctl enable "tomcat@${instance}-${application}"
+        systemctl start "tomcat@${instance}-${application}"
+
+      fi
+
+      rm -f "$line/added"
+
+    # update instances
+    elif test -f "$line/updated"; then
+
+      if test -f "$line/disabled.bin"; then
+
+        systemctl disable "tomcat@${instance}-${application}"
+        systemctl stop "tomcat@${instance}-${application}"
+
+        run_scripts "${instance}" "${application}" "${line}"
+
+      else
+
+        run_scripts "${instance}" "${application}" "${line}"
+
+        systemctl enable "tomcat@${instance}-${application}"
+        systemctl restart "tomcat@${instance}-${application}"
+
+      fi
+
+      rm -f "$line/updated"
+
+    # remove old instances
+    elif test -f "$line/removed"; then
+
+      logger -t tomcat-autodiscovery@${instance} "removing tomcat server instance ${instance}-${application}..."
+
+      systemctl disable "tomcat@${instance}-${application}"
+      systemctl stop "tomcat@${instance}-${application}"
+
+      remove_instance "${instance}" "${application}"
+      logger -t tomcat-autodiscovery@${instance} "removed tomcat server instance ${instance}-${application}."
+
+      # remove folder
+      rm -f "${target}"/*
+      rmdir "${target}"
+      rm -f "${line}"
+
+    fi
+
+  done
+
+fi
+
