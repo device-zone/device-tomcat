@@ -90,8 +90,24 @@ if [ $# -eq 1 ]; then
     fi
     application="$(head $line/name.txt)"
 
+    # remove old instances
+    if test -f "$line/removed"; then
+
+      logger -t tomcat-autodiscovery@${instance} "removing tomcat server instance ${instance}-${application}..."
+
+      systemctl disable "tomcat@${instance}-${application}"
+      systemctl stop "tomcat@${instance}-${application}"
+
+      remove_instance "${instance}" "${application}"
+      logger -t tomcat-autodiscovery@${instance} "removed tomcat server instance ${instance}-${application}."
+
+      # remove folder
+      rm -f "${target}"/*
+      rmdir "${target}"
+      rm -f "${line}"
+
     # add new instances
-    if test -f "$line/added"; then
+    elif test -f "$line/added"; then
 
       # instance already exist and we're told to add? skip
       if test -d "/var/lib/tomcats/${instance}-${application}"; then
@@ -141,22 +157,6 @@ if [ $# -eq 1 ]; then
       fi
 
       rm -f "$line/updated"
-
-    # remove old instances
-    elif test -f "$line/removed"; then
-
-      logger -t tomcat-autodiscovery@${instance} "removing tomcat server instance ${instance}-${application}..."
-
-      systemctl disable "tomcat@${instance}-${application}"
-      systemctl stop "tomcat@${instance}-${application}"
-
-      remove_instance "${instance}" "${application}"
-      logger -t tomcat-autodiscovery@${instance} "removed tomcat server instance ${instance}-${application}."
-
-      # remove folder
-      rm -f "${target}"/*
-      rmdir "${target}"
-      rm -f "${line}"
 
     fi
 
