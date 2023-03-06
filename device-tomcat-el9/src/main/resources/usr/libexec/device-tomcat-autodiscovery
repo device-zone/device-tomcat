@@ -32,6 +32,7 @@ create_instance() {
   instance="${1}"
   application="${2}"
 
+  install -m 0755 -d "/var/lib/tomcats/${instance}-${application}"
 }
 
 
@@ -41,6 +42,7 @@ remove_instance() {
   instance="${1}"
   application="${2}"
 
+  rm -rf "/var/lib/tomcats/${instance}-${application}"
 }
 
 
@@ -91,7 +93,7 @@ if [ $# -eq 1 ]; then
     # add new instances
     if test -f "$line/added"; then
 
-      # instance already exist and we're told to add? none of our business, remove the device config for safety
+      # instance already exist and we're told to add? skip
       if test -d "/var/lib/tomcats/${instance}-${application}"; then
 
         logger -t tomcat-autodiscovery@${instance} "/var/lib/tomcats/${instance}-${application} already exists, ignoring '$line'."
