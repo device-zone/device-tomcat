@@ -128,6 +128,7 @@
           -->
 	  <requires>
             <require>tomcat</require>
+            <require>tomcat-native</require>
           </requires>
         </configuration>
       </plugin>
