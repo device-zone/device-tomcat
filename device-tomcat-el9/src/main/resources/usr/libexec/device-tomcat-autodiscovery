@@ -65,10 +65,8 @@ run_scripts() {
 
   if test ! -f "error"; then
     logger -t "tomcat-autodiscovery@${instance}" "completed autodiscovery for tomcat instance ${instance} / application ${application}."
-    exit 0
   else
     logger -t "tomcat-autodiscovery@${instance}" "failed autodiscovery for tomcat instance ${instance} / application ${application}."
-    exit 1
   fi
 
 }
