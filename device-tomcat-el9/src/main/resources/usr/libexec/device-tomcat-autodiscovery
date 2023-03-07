@@ -33,6 +33,7 @@ create_instance() {
   application="${2}"
 
   install -m 0755 -d "/var/lib/tomcats/${instance}-${application}"
+  install -m 0755 -d "/etc/systemd/system/tomcat@${instance}-${application}.service.d"
 }
 
 
@@ -43,6 +44,10 @@ remove_instance() {
   application="${2}"
 
   rm -rf "/var/lib/tomcats/${instance}-${application}"
+  rm -rf "/etc/systemd/system/tomcat@${instance}-${application}.service.d"
+  rm -f "/etc/sysconfig/tomcat@${instance}-${application}"
+
+  systemctl daemon-reload
 }
 
 
