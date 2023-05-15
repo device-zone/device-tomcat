@@ -27,6 +27,7 @@
 
   <modules>
     <module>device-tomcat-el9</module>
+    <module>device-tomcat-docs-el9</module>
   </modules>
 
   <build>

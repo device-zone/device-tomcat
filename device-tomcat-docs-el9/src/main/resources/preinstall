@@ -1,0 +1,4 @@
+/usr/bin/getent group ${device.tomcat.group} > /dev/null || /usr/sbin/groupadd -r ${device.tomcat.group}
+/usr/bin/getent passwd ${device.tomcat.user} > /dev/null || /usr/sbin/useradd -r -g ${device.tomcat.group} ${device.tomcat.user} -s /sbin/nologin -d /var/lib/tomcats/
+/usr/bin/getent group ${device.postgresql.group} > /dev/null || /usr/sbin/groupadd -r ${device.postgresql.group} -g ${device.postgresql.groupid}
+/usr/sbin/usermod -a -G ${device.postgresql.group} ${device.tomcat.user}

@@ -1,0 +1,5 @@
+if [ $1 = 0 ]; then
+  /usr/bin/systemctl stop tomcat-autodiscovery@${device.tomcat.instance}.service
+  /usr/bin/systemctl disable tomcat-autodiscovery@${device.tomcat.instance}.service
+fi
+
