@@ -152,6 +152,7 @@ EOF
     -->
     <Connector protocol="org.apache.coyote.http11.Http11NioProtocol"
                unixDomainSocketPath="/run/tomcat-${instance}-${application}/socket"
+               unixDomainSocketPathPermissions="rw-rw----"
                maxThreads="150" SSLEnabled="false">
     </Connector>
 
