@@ -63,6 +63,7 @@ if [ "${instance}" = "${device.tomcat.instance}" ]; then
 #
 [Service]
 User=${device.tomcat.user}
+RuntimeDirectory=tomcat-${instance}-${application}
 EOF
 
   install -m 644 "local.conf" "/etc/systemd/system/tomcat@${instance}-${application}.service.d"
@@ -150,7 +151,7 @@ EOF
     <!-- Java 17+ required for unix domain sockets
     -->
     <Connector protocol="org.apache.coyote.http11.Http11NioProtocol"
-               unixDomainSocketPath="/tmp/.s.tomcat-${instance}-${application}"
+               unixDomainSocketPath="/run/tomcat-${instance}-${application}/socket"
                maxThreads="150" SSLEnabled="false">
     </Connector>
 
