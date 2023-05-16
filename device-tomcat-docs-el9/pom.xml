@@ -19,7 +19,7 @@
     <device.tomcat.group>docs</device.tomcat.group>
     <device.tomcat.docbase>/var/lib/tomcat/webapps/docs/</device.tomcat.docbase>
     <device.postgresql.group>postgres</device.postgresql.group>
-    <device.postgresql.groupid>26</device.postgresql.groupid>
+    <device.httpd.user>apache</device.httpd.user>
     <device.datasource.global>jdbc/GlobalTomcatDatasource</device.datasource.global>
     <device.datasource.path>jdbc/TomcatDatasource</device.datasource.path>
   </properties>
