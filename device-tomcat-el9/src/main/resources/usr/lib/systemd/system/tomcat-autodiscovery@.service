@@ -2,6 +2,7 @@
 
 [Unit]
 Description=Tomcat Server Autodiscovery %i.
+Before=httpd-autodiscovery.service
 After=firewalld.service
 
 [Service]
