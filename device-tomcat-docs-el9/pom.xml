@@ -107,7 +107,20 @@
               <groupname>root</groupname>
               <sources>
                 <source>
-                  <location>target/classes/usr/libexec/device-tomcat-autodiscovery-${device.tomcat.instance}</location>
+                  <location>target/classes/usr/libexec/device-tomcat-autodiscovery-webapp</location>
+                  <destination>50-${device.tomcat.instance}</destination>
+                </source>
+              </sources>
+            </mapping>
+            <mapping>
+              <directory>/usr/libexec/device-httpd-autodiscovery-virtualhost.d</directory>
+              <directoryIncluded>false</directoryIncluded>
+              <filemode>755</filemode>
+              <username>root</username>
+              <groupname>root</groupname>
+              <sources>
+                <source>
+                  <location>target/classes/usr/libexec/device-httpd-autodiscovery-virtualhost-webapp</location>
                   <destination>50-${device.tomcat.instance}</destination>
                 </source>
               </sources>

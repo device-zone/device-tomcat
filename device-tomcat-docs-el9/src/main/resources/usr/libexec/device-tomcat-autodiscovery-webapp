@@ -51,6 +51,12 @@ if [ "${instance}" = "${device.tomcat.instance}" ]; then
   install -o root -g ${device.tomcat.group} -m 0770 -d "/var/lib/tomcats/${instance}-${application}/work"
   install -o root -g ${device.tomcat.group} -m 0770 -d "/var/lib/tomcats/${instance}-${application}/temp"
 
+  if test ! -e "/var/lib/tomcats/${instance}-${application}/conf/jwt-secret.txt"; then
+    openssl rand 32 > /var/lib/tomcats/${instance}-${application}/conf/jwt-secret.txt
+    chown ${device.tomcat.user} /var/lib/tomcats/${instance}-${application}/conf/jwt-secret.txt
+    chmod 0600 /var/lib/tomcats/${instance}-${application}/conf/jwt-secret.txt
+  fi
+
   if test ! -L "/var/lib/tomcats/${instance}-${application}/conf/web.xml"; then
     ln -s -f /etc/tomcat/web.xml "/var/lib/tomcats/${instance}-${application}/conf/"
   fi
@@ -80,9 +86,8 @@ EOF
   # junixsocket needs to unpack into an executable directory
   JAVA_OPTS="-Dorg.newsclub.net.unix.library.tmpdir=/var/lib/tomcats/${instance}-${application}/temp"
 
-  if test -f "$line/jws-secret.txt"; then
-    JAVA_OPTS="${JAVA_OPTS} -Dmedia.pepperpot.jwt.JWSAlgorithm=HS256 -Dmedia.pepperpot.jws.SecretFile=$line/jws-secret.txt"
-  fi
+  # wire through the jwt secret
+  JAVA_OPTS="${JAVA_OPTS} -Dmedia.pepperpot.jwt.JWSAlgorithm=HS256 -Dmedia.pepperpot.jws.SecretFile=/var/lib/tomcats/${instance}-${application}/conf/jwt-secret.txt"
 
   cat >> "environment" <<-EOF
 JAVA_OPTS="${JAVA_OPTS}"
