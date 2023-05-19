@@ -34,6 +34,8 @@ create_instance() {
 
   install -m 0755 -d "/var/lib/tomcats/${instance}-${application}"
   install -m 0755 -d "/etc/systemd/system/tomcat@${instance}-${application}.service.d"
+
+  semanage fcontext -a -t httpd_var_run_t "/var/run/tomcat-${instance}-${application}/socket"
 }
 
 
@@ -46,6 +48,8 @@ remove_instance() {
   rm -rf "/var/lib/tomcats/${instance}-${application}"
   rm -rf "/etc/systemd/system/tomcat@${instance}-${application}.service.d"
   rm -f "/etc/sysconfig/tomcat@${instance}-${application}"
+
+  semanage fcontext -d -t httpd_var_run_t "/var/run/tomcat-${instance}-${application}/socket" || true
 
   systemctl daemon-reload
 }
@@ -98,7 +102,6 @@ if [ $# -eq 1 ]; then
 
       logger -t tomcat-autodiscovery@${instance} "removing tomcat server instance ${instance}-${application}..."
 
-      systemctl disable "tomcat@${instance}-${application}"
       systemctl stop "tomcat@${instance}-${application}"
 
       remove_instance "${instance}" "${application}"
@@ -128,12 +131,10 @@ if [ $# -eq 1 ]; then
 
       if test -f "$line/disabled.bin"; then
 
-        systemctl disable "tomcat@${instance}-${application}"
         systemctl stop "tomcat@${instance}-${application}"
 
       else
 
-        systemctl enable "tomcat@${instance}-${application}"
         systemctl start "tomcat@${instance}-${application}"
 
       fi
@@ -145,7 +146,6 @@ if [ $# -eq 1 ]; then
 
       if test -f "$line/disabled.bin"; then
 
-        systemctl disable "tomcat@${instance}-${application}"
         systemctl stop "tomcat@${instance}-${application}"
 
         run_scripts "${instance}" "${application}" "${line}"
@@ -154,12 +154,23 @@ if [ $# -eq 1 ]; then
 
         run_scripts "${instance}" "${application}" "${line}"
 
-        systemctl enable "tomcat@${instance}-${application}"
         systemctl restart "tomcat@${instance}-${application}"
 
       fi
 
       rm -f "$line/updated"
+
+    else
+
+      if test -f "$line/disabled.bin"; then
+
+        systemctl stop "tomcat@${instance}-${application}"
+
+      else
+
+        systemctl restart "tomcat@${instance}-${application}"
+
+      fi
 
     fi
 
