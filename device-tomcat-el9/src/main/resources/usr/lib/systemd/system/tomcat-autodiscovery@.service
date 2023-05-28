@@ -7,8 +7,8 @@ After=firewalld.service
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash /usr/libexec/device-tomcat-autodiscovery %i
-ExecReload=/bin/bash /usr/libexec/device-tomcat-autodiscovery %i
+ExecStart=/bin/bash /usr/libexec/device-autodiscovery/tomcat %i
+ExecReload=/bin/bash /usr/libexec/device-autodiscovery/tomcat %i
 RemainAfterExit=on
 
 [Install]
