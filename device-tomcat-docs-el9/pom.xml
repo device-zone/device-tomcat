@@ -113,7 +113,7 @@
               </sources>
             </mapping>
             <mapping>
-              <directory>/usr/libexec/device-httpd-autodiscovery-virtualhost.d</directory>
+              <directory>/usr/libexec/device-autodiscovery/httpd-virtualhost.d</directory>
               <directoryIncluded>false</directoryIncluded>
               <filemode>755</filemode>
               <username>root</username>
