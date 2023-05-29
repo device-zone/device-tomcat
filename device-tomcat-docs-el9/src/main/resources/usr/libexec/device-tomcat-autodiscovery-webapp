@@ -69,7 +69,11 @@ if [ "${instance}" = "${device.tomcat.instance}" ]; then
 #
 [Service]
 User=${device.tomcat.user}
-RuntimeDirectory=tomcat-${instance}-${application}
+# RuntimeDirectory is not compatible with SELinux
+#RuntimeDirectory=tomcat-${instance}-${application}
+PermissionsStartOnly=true
+ExecStartPre=-/usr/bin/install -m 0750 -o ${device.tomcat.user} -g ${device.tomcat.group} -d /run/tomcat-${instance}-${application}
+ExecStartPre=-/usr/sbin/restorecon /run/tomcat-${instance}-${application}
 EOF
 
   install -m 644 "local.conf" "/etc/systemd/system/tomcat@${instance}-${application}.service.d"
