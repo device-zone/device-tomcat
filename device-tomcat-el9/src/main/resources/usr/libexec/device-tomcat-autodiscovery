@@ -45,7 +45,9 @@ remove_instance() {
   instance="${1}"
   application="${2}"
 
-  systemd-tmpfiles --remove "/etc/tmpfiles.d/tomcat-${instance}-${application}.conf"
+  if test -f "/etc/tmpfiles.d/tomcat-${instance}-${application}.conf"; then
+    systemd-tmpfiles --remove "/etc/tmpfiles.d/tomcat-${instance}-${application}.conf"
+  fi
 
   rm -rf "/var/lib/tomcats/${instance}-${application}"
   rm -rf "/etc/systemd/system/tomcat@${instance}-${application}.service.d"
