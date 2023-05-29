@@ -32,10 +32,10 @@ create_instance() {
   instance="${1}"
   application="${2}"
 
+  semanage fcontext -a -t httpd_var_run_t "/var/run/tomcat-${instance}-${application}"
+
   install -m 0755 -d "/var/lib/tomcats/${instance}-${application}"
   install -m 0755 -d "/etc/systemd/system/tomcat@${instance}-${application}.service.d"
-
-  semanage fcontext -a -t httpd_var_run_t "/var/run/tomcat-${instance}-${application}/socket"
 }
 
 
@@ -49,7 +49,7 @@ remove_instance() {
   rm -rf "/etc/systemd/system/tomcat@${instance}-${application}.service.d"
   rm -f "/etc/sysconfig/tomcat@${instance}-${application}"
 
-  semanage fcontext -d -t httpd_var_run_t "/var/run/tomcat-${instance}-${application}/socket" || true
+  semanage fcontext -d -t httpd_var_run_t "/var/run/tomcat-${instance}-${application}" || true
 
   systemctl daemon-reload
 }
