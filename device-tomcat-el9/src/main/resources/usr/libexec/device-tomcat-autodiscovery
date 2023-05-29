@@ -45,9 +45,12 @@ remove_instance() {
   instance="${1}"
   application="${2}"
 
+  systemd-tmpfiles --remove "/etc/tmpfiles.d/tomcat-${instance}-${application}.conf"
+
   rm -rf "/var/lib/tomcats/${instance}-${application}"
   rm -rf "/etc/systemd/system/tomcat@${instance}-${application}.service.d"
   rm -f "/etc/sysconfig/tomcat@${instance}-${application}"
+  rm -f "/etc/tmpfiles.d/tomcat-${instance}-${application}.conf"
 
   semanage fcontext -d -t httpd_var_run_t "/var/run/tomcat-${instance}-${application}" || true
 
