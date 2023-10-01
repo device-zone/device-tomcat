@@ -8,7 +8,7 @@
 
   <artifactId>device-tomcat</artifactId>
   <groupId>zone.device.platform</groupId>
-  <version>0.9.5-SNAPSHOT</version>
+  <version>0.9.5</version>
   <packaging>pom</packaging>
   <name>device tomcat package</name>
   <description>Packaging for the tomcat appliances</description>
@@ -20,9 +20,9 @@
   </organization>
 
   <scm>
-    <connection>scm:svn:https://github.com/device-zone/device-tomcat/trunk</connection>
-    <developerConnection>scm:svn:https://github.com/device-zone/device-tomcat/trunk</developerConnection>
-    <url>https://github.com/device-zone/device-tomcat/trunk</url>
+    <connection>scm:svn:https://github.com/device-zone/device-tomcat/tags/device-tomcat-0.9.5</connection>
+    <developerConnection>scm:svn:https://github.com/device-zone/device-tomcat/tags/device-tomcat-0.9.5</developerConnection>
+    <url>https://github.com/device-zone/device-tomcat/tags/device-tomcat-0.9.5</url>
   </scm>
 
   <modules>
